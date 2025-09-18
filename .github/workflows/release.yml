@@ -1,0 +1,239 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.3.0)'
+        required: true
+        default: 'v1.3.0'
+
+env:
+  GO_VERSION: '1.21'
+  APP_NAME: 'npm-security-scanner'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Check coverage
+        run: go tool cover -func=coverage.out
+
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          args: --timeout=5m
+
+  build:
+    name: Build Cross-Platform Binaries
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        include:
+          - goos: darwin
+            goarch: amd64
+            binary_suffix: '-macos-amd64'
+          - goos: darwin
+            goarch: arm64
+            binary_suffix: '-macos-arm64'
+          - goos: windows
+            goarch: amd64
+            binary_suffix: '-windows-amd64.exe'
+          - goos: linux
+            goarch: amd64
+            binary_suffix: '-linux-amd64'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          VERSION=${{ github.ref_name }}
+          if [ "$VERSION" = "" ]; then
+            VERSION=${{ github.event.inputs.version }}
+          fi
+          
+          LDFLAGS="-s -w -X main.appVersion=${VERSION} -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ) -X main.gitCommit=${{ github.sha }}"
+          
+          go build -ldflags="$LDFLAGS" -o ${{ env.APP_NAME }}${{ matrix.binary_suffix }} .
+
+      - name: Create checksum
+        run: |
+          if [[ "${{ matrix.goos }}" == "windows" ]]; then
+            sha256sum ${{ env.APP_NAME }}${{ matrix.binary_suffix }} > ${{ env.APP_NAME }}${{ matrix.binary_suffix }}.sha256
+          else
+            shasum -a 256 ${{ env.APP_NAME }}${{ matrix.binary_suffix }} > ${{ env.APP_NAME }}${{ matrix.binary_suffix }}.sha256
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.APP_NAME }}${{ matrix.binary_suffix }}
+          path: |
+            ${{ env.APP_NAME }}${{ matrix.binary_suffix }}
+            ${{ env.APP_NAME }}${{ matrix.binary_suffix }}.sha256
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Move artifacts to root
+        run: |
+          find ./artifacts -name "${{ env.APP_NAME }}-*" -exec mv {} ./ \;
+          ls -la ${{ env.APP_NAME }}-*
+
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=${{ github.ref_name }}
+          if [ "$VERSION" = "" ]; then
+            VERSION=${{ github.event.inputs.version }}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_without_v=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat << 'EOF' > release_notes.md
+          ## 🔍 NPM Security Scanner ${{ steps.get_version.outputs.version }}
+          
+          NPMパッケージのマルウェア感染対策のための包括的セキュリティスキャナー
+          
+          ### ✨ 主要機能
+          - 🔍 **再帰的スキャン**: ディレクトリ配下のすべてのNPMプロジェクトを自動検出
+          - 🛡️ **Safe Chain連携**: 高度なセキュリティスキャンエンジン
+          - 📊 **美しいレポート**: HTML・JSON・ターミナル形式でのレポート生成
+          - ⚡ **高速処理**: 並列処理による効率的なスキャン
+          - 🎯 **脆弱性検出**: 詳細な脆弱性情報と修正提案
+          
+          ### 📦 ダウンロード
+          
+          お使いのプラットフォームに応じてダウンロードしてください：
+          
+          - **macOS (Intel)**: `npm-security-scanner-macos-amd64`
+          - **macOS (Apple Silicon)**: `npm-security-scanner-macos-arm64`  
+          - **Windows**: `npm-security-scanner-windows-amd64.exe`
+          - **Linux**: `npm-security-scanner-linux-amd64`
+          
+          ### 🚀 使用方法
+          
+          ```bash
+          # バイナリをダウンロード後、実行権限を付与
+          chmod +x npm-security-scanner-*
+          
+          # スキャン実行
+          ./npm-security-scanner-* /path/to/projects
+          ```
+          
+          ### 📝 変更内容
+          
+          詳細な変更内容は [CHANGELOG.md](./CHANGELOG.md) をご確認ください。
+          
+          ### 🔐 セキュリティ検証
+          
+          各バイナリにはSHA256チェックサムが付属しています。ダウンロード後に整合性を確認してください：
+          
+          ```bash
+          # macOSの場合
+          shasum -a 256 npm-security-scanner-macos-amd64
+          
+          # Windowsの場合
+          Get-FileHash npm-security-scanner-windows-amd64.exe -Algorithm SHA256
+          ```
+          EOF
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.get_version.outputs.version }}
+          name: "Release ${{ steps.get_version.outputs.version }}"
+          bodyFile: release_notes.md
+          draft: false
+          prerelease: false
+          artifacts: |
+            npm-security-scanner-macos-amd64
+            npm-security-scanner-macos-amd64.sha256
+            npm-security-scanner-macos-arm64
+            npm-security-scanner-macos-arm64.sha256
+            npm-security-scanner-windows-amd64.exe
+            npm-security-scanner-windows-amd64.exe.sha256
+            npm-security-scanner-linux-amd64
+            npm-security-scanner-linux-amd64.sha256
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    name: Notify Success
+    runs-on: ubuntu-latest
+    needs: release
+    if: success()
+    steps:
+      - name: Success notification
+        run: |
+          echo "🎉 Release ${{ github.ref_name }} completed successfully!"
+          echo "📦 Binaries are now available on the GitHub releases page"
+          echo "🔗 https://github.com/${{ github.repository }}/releases/latest"

@@ -1,0 +1,29 @@
+{
+  "name": "demo-frontend",
+  "version": "1.0.0",
+  "description": "Demo frontend project for testing nested scanning",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "webpack-dev-server --mode development",
+    "build": "webpack --mode production",
+    "test": "jest"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "axios": "^1.4.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0",
+    "jest": "^29.6.0"
+  },
+  "keywords": [
+    "react",
+    "frontend",
+    "demo"
+  ],
+  "author": "npm-security-scanner",
+  "license": "MIT"
+}

@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPM Security Scanner Report - scan_1758224023</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-equal-height {
+            height: 100%;
+        }
+        .vulnerability-item {
+            border-left: 4px solid;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .vulnerability-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .vuln-critical {
+            border-left-color: #ff3860;
+            background: linear-gradient(to right, #feecf0, #fef7f7);
+        }
+        .vuln-high {
+            border-left-color: #ff6348;
+            background: linear-gradient(to right, #fef0ef, #fef7f7);
+        }
+        .vuln-moderate {
+            border-left-color: #ffdd57;
+            background: linear-gradient(to right, #fffbeb, #fffef7);
+        }
+        .vuln-low {
+            border-left-color: #209cee;
+            background: linear-gradient(to right, #eff5ff, #f7faff);
+        }
+        .vuln-fixed {
+            border-left-color: #23d160;
+            background: linear-gradient(to right, #f0fff4, #f7fef9);
+        }
+        .stats-card {
+            transition: transform 0.2s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-4px);
+        }
+        .scan-meta {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .project-card {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section with Gradient Background -->
+    <section class="hero is-large hero-gradient">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title is-1 has-text-white">
+                    <i class="fas fa-shield-virus"></i>
+                    NPM Security Scanner
+                </h1>
+                <h2 class="subtitle is-3 has-text-white-ter">
+                    Comprehensive malware protection for your Node.js projects
+                </h2>
+                <div class="scan-meta">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading has-text-white-ter">Report ID</p>
+                                    <p class="title is-5 has-text-white">scan_1758224023</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading has-text-white-ter">Generated</p>
+                                    <p class="title is-5 has-text-white">2025-09-19 04:34:59</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading has-text-white-ter">Total Duration</p>
+                                    <p class="title is-5 has-text-white">1m16s</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <span class="tag is-large is-success">
+                                    <i class="fas fa-link"></i>&nbsp;
+                                    Safe Chain: true
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Cards -->
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-3">
+                    <div class="card stats-card">
+                        <div class="card-content has-text-centered">
+                            <div class="content">
+                                <i class="fas fa-folder-open fa-3x has-text-info mb-3"></i>
+                                <p class="title is-1 has-text-info">16</p>
+                                <p class="subtitle is-5">Projects Scanned</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-3">
+                    <div class="card stats-card">
+                        <div class="card-content has-text-centered">
+                            <div class="content">
+                                <i class="fas fa-check-circle fa-3x has-text-success mb-3"></i>
+                                <p class="title is-1 has-text-success">16</p>
+                                <p class="subtitle is-5">Successful</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-3">
+                    <div class="card stats-card">
+                        <div class="card-content has-text-centered">
+                            <div class="content">
+                                <i class="fas fa-times-circle fa-3x has-text-danger mb-3"></i>
+                                <p class="title is-1 has-text-danger">0</p>
+                                <p class="subtitle is-5">Failed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-3">
+                    <div class="card stats-card">
+                        <div class="card-content has-text-centered">
+                            <div class="content">
+                                <i class="fas fa-bug fa-3x has-text-warning mb-3"></i>
+                                <p class="title is-1 has-text-warning">4</p>
+                                <p class="subtitle is-5">Total Vulnerabilities</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Results -->
+    <section class="section">
+        <div class="container">
+            
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    1. /Users/pality/portfolio/Archive/lol-wiki/frontend
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">23s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:33:43</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="field">
+                        <label class="label">
+                            <i class="fas fa-bug"></i>&nbsp; 
+                            Security Vulnerabilities (2 found)
+                        </label>
+                        <div class="vulnerability-item vuln-moderate">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <span class="tag is-warning is-medium">
+                                            <i class="fas fa-exclamation-triangle"></i>&nbsp;
+                                            MODERATE
+                                        </span>
+                                    </div>
+                                    <div class="level-item">
+                                        <div>
+                                            <p class="has-text-weight-bold">@docusaurus/theme-search-algolia</p>
+                                            <p class="is-size-7 has-text-grey">moderate severity vulnerability found</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <span class="tag is-light">
+                                    <i class="fas fa-clock"></i>&nbsp; PENDING
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vulnerability-item vuln-moderate">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <span class="tag is-warning is-medium">
+                                            <i class="fas fa-exclamation-triangle"></i>&nbsp;
+                                            MODERATE
+                                        </span>
+                                    </div>
+                                    <div class="level-item">
+                                        <div>
+                                            <p class="has-text-weight-bold">npm-audit-detected</p>
+                                            <p class="is-size-7 has-text-grey">moderate severity vulnerability detected via npm audit</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <span class="tag is-light">
+                                    <i class="fas fa-clock"></i>&nbsp; PENDING
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    2. /Users/pality/portfolio/KIC/advanced_software_development/flight_reservation/frontend
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">3s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:05</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    3. /Users/pality/portfolio/Tri-CertFramework/circuits
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">2s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:08</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    4. /Users/pality/portfolio/Tri-CertFramework/executive-console
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">3s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:10</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    5. /Users/pality/portfolio/Tri-CertFramework/prover/.next
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">1s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:14</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    6. /Users/pality/portfolio/Tri-CertFramework/prover/.next/types
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">1s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:14</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    7. /Users/pality/portfolio/Tri-CertFramework/prover
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">9s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:15</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    8. /Users/pality/portfolio/Tri-CertFramework/scripts
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">2s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:24</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    9. /Users/pality/portfolio/Tri-CertFramework/verifier-ui/.next
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">1s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:26</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    10. /Users/pality/portfolio/Tri-CertFramework/verifier-ui/.next/types
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">1s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:27</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    11. /Users/pality/portfolio/Tri-CertFramework/verifier-ui
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">10s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:28</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    12. /Users/pality/portfolio/fido2-test
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">2s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:38</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    13. /Users/pality/portfolio/link-checker
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">12s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:40</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="field">
+                        <label class="label">
+                            <i class="fas fa-bug"></i>&nbsp; 
+                            Security Vulnerabilities (1 found)
+                        </label>
+                        <div class="vulnerability-item vuln-low">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <span class="tag is-info is-medium">
+                                            <i class="fas fa-info-circle"></i>&nbsp;
+                                            LOW
+                                        </span>
+                                    </div>
+                                    <div class="level-item">
+                                        <div>
+                                            <p class="has-text-weight-bold">npm-audit-detected</p>
+                                            <p class="is-size-7 has-text-grey">low severity vulnerability detected via npm audit</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <span class="tag is-light">
+                                    <i class="fas fa-clock"></i>&nbsp; PENDING
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    14. /Users/pality/portfolio/npm-security-scanner/examples/demo-project
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">2s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:52</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    15. /Users/pality/portfolio/npm-security-scanner/examples/nested-project/backend
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">2s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:53</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="notification is-success is-light">
+                        <i class="fas fa-shield-alt"></i>&nbsp;
+                        <strong>No vulnerabilities detected</strong> - Your project is secure!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card project-card">
+            <header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    16. /Users/pality/portfolio/npm-security-scanner/examples/nested-project/frontend
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag is-success is-medium">
+                        <i class="fas fa-check-circle"></i>&nbsp;
+                        success
+                    </span>
+                </div>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">3s</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">04:34:55</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div class="field is-grouped is-grouped-multiline">
+                        
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-trash"></i>&nbsp; Node Modules
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-download"></i>&nbsp; NPM Install
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <div class="tags has-addons">
+                                <span class="tag is-dark">
+                                    <i class="fas fa-search"></i>&nbsp; Security Scan
+                                </span>
+                                <span class="tag is-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerabilities Section -->
+                    
+                    <div class="field">
+                        <label class="label">
+                            <i class="fas fa-bug"></i>&nbsp; 
+                            Security Vulnerabilities (1 found)
+                        </label>
+                        <div class="vulnerability-item vuln-moderate">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <span class="tag is-warning is-medium">
+                                            <i class="fas fa-exclamation-triangle"></i>&nbsp;
+                                            MODERATE
+                                        </span>
+                                    </div>
+                                    <div class="level-item">
+                                        <div>
+                                            <p class="has-text-weight-bold">npm-audit-detected</p>
+                                            <p class="is-size-7 has-text-grey">moderate severity vulnerability detected via npm audit</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <span class="tag is-light">
+                                    <i class="fas fa-clock"></i>&nbsp; PENDING
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>NPM Security Scanner v1.3.0</strong><br>
+                Generated at 2025-09-19 04:34:59<br>
+                <i class="fas fa-shield-alt"></i> Protecting your dependencies from malware
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
