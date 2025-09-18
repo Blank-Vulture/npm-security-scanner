@@ -306,13 +306,13 @@ func generateBulmaProjectCard(index int, result *ScanResult) string {
 // generateBulmaActionsHTML generates Bulma tags for each action
 func generateBulmaActionsHTML(result *ScanResult) string {
 	actions := []struct {
-		action ActionResult
 		icon   string
 		name   string
+		action ActionResult
 	}{
-		{result.NodeModules, "fas fa-trash", "Node Modules"},
-		{result.NpmInstall, "fas fa-download", "NPM Install"},
-		{result.SecurityScan, "fas fa-search", "Security Scan"},
+		{"fas fa-trash", "Node Modules", result.NodeModules},
+		{"fas fa-download", "NPM Install", result.NpmInstall},
+		{"fas fa-search", "Security Scan", result.SecurityScan},
 	}
 
 	html := ""
