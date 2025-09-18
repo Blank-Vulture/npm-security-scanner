@@ -1,4 +1,5 @@
-// Package main provides NPM security scanner for detecting malware in Node.js projects
+// Package main provides NPM security scanner for detecting malware in Node.js projects  
+// Git push issue resolved: removed conflicting main tag
 package main
 
 // Status constants
