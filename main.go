@@ -80,10 +80,7 @@ func runScanner(_ *cobra.Command, args []string) {
 	}
 
 	// Step 4: スキャン実行
-	if err := scanProjects(projects); err != nil {
-		errorColor.Printf("❌ Scan failed: %v\n", err)
-		os.Exit(1)
-	}
+	scanProjects(projects)
 
 	successColor.Println("✅ All projects scanned successfully!")
 }

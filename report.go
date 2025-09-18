@@ -14,13 +14,13 @@ import (
 type ScanResult struct {
 	StartTime       time.Time       `json:"start_time"`
 	EndTime         time.Time       `json:"end_time"`
-	Duration        time.Duration   `json:"duration"`
 	Vulnerabilities []Vulnerability `json:"vulnerabilities"`
 	ProjectPath     string          `json:"project_path"`
 	Status          string          `json:"status"`
 	NodeModules     ActionResult    `json:"node_modules"`
 	NpmInstall      ActionResult    `json:"npm_install"`
 	SecurityScan    ActionResult    `json:"security_scan"`
+	Duration        time.Duration   `json:"duration"`
 }
 
 // ActionResult represents the result of a specific action
@@ -306,13 +306,13 @@ func generateBulmaProjectCard(index int, result *ScanResult) string {
 // generateBulmaActionsHTML generates Bulma tags for each action
 func generateBulmaActionsHTML(result *ScanResult) string {
 	actions := []struct {
-		name   string
 		action ActionResult
 		icon   string
+		name   string
 	}{
-		{"Node Modules", result.NodeModules, "fas fa-trash"},
-		{"NPM Install", result.NpmInstall, "fas fa-download"},
-		{"Security Scan", result.SecurityScan, "fas fa-search"},
+		{result.NodeModules, "fas fa-trash", "Node Modules"},
+		{result.NpmInstall, "fas fa-download", "NPM Install"},
+		{result.SecurityScan, "fas fa-search", "Security Scan"},
 	}
 
 	html := ""
@@ -493,7 +493,8 @@ func generateBulmaHTMLHead() string {
 func generateBulmaCSS() string {
 	return `
         .hero-gradient { background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); }
-        .vulnerability-item { border-left: 4px solid; border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem; transition: all 0.2s ease; }
+        .vulnerability-item { border-left: 4px solid; border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem; 
+                              transition: all 0.2s ease; }
         .vulnerability-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .vuln-critical { border-left-color: #ff3860; background: linear-gradient(to right, #feecf0, #fef7f7); }
         .vuln-high { border-left-color: #ff6348; background: linear-gradient(to right, #fef0ef, #fef7f7); }

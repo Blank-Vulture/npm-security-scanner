@@ -116,30 +116,43 @@ func isSafeChainSetupComplete() bool {
 func runSecurityScan(projectDir string, result *ScanResult) error {
 	infoColor.Printf("  🔍 Running security scan in %s...\n", projectDir)
 
-	// Safe Chainが利用可能かチェック
 	if err := checkCommand("safe-chain"); err != nil {
 		warningColor.Printf("  ⚠️  Safe Chain not found, running demo scan for %s\n", projectDir)
 		return runDemoScan(projectDir, result)
 	}
 
-	// npm audit (Safe Chainでラップされたコマンドとして実行)
+	auditOutput, auditErr := executeNpmAudit(projectDir)
+	fixOutput, fixErr := executeNpmAuditFix(projectDir)
+
+	processAuditResults(result, auditOutput, auditErr)
+	processFixResults(result, fixOutput, fixErr, projectDir)
+	displayScanResults(result, projectDir)
+
+	return nil
+}
+
+// executeNpmAudit executes npm audit command
+func executeNpmAudit(projectDir string) (string, error) {
 	infoColor.Printf("  🔍 Running npm audit (wrapped by Safe Chain) in %s...\n", projectDir)
 	auditCmd := exec.Command("npm", "audit", "--audit-level=moderate")
 	auditCmd.Dir = projectDir
-
 	auditOutput, auditErr := auditCmd.CombinedOutput()
+	return string(auditOutput), auditErr
+}
 
-	// npm audit fix も実行
+// executeNpmAuditFix executes npm audit fix command
+func executeNpmAuditFix(projectDir string) (string, error) {
 	infoColor.Printf("  🔧 Running npm audit fix (wrapped by Safe Chain) in %s...\n", projectDir)
 	fixCmd := exec.Command("npm", "audit", "fix")
 	fixCmd.Dir = projectDir
-
 	fixOutput, fixErr := fixCmd.CombinedOutput()
+	return string(fixOutput), fixErr
+}
 
-	// 結果をレポートに記録
-	// npm auditは脆弱性が見つかった場合にexit status 1を返すが、これは正常動作
-	result.SecurityScan.Output = string(auditOutput)
-	result.Vulnerabilities = parseVulnerabilities(string(auditOutput))
+// processAuditResults processes npm audit results
+func processAuditResults(result *ScanResult, auditOutput string, auditErr error) {
+	result.SecurityScan.Output = auditOutput
+	result.Vulnerabilities = parseVulnerabilities(auditOutput)
 
 	if auditErr != nil {
 		// exit status 1は脆弱性発見を意味するので、成功として扱う
@@ -152,29 +165,31 @@ func runSecurityScan(projectDir string, result *ScanResult) error {
 	} else {
 		result.SecurityScan.Success = true
 	}
+}
 
-	// Fix結果も記録
+// processFixResults processes npm audit fix results
+func processFixResults(result *ScanResult, fixOutput string, fixErr error, projectDir string) {
 	if fixErr == nil {
-		infoColor.Printf("  🔧 Fix results:\n%s\n", string(fixOutput))
+		infoColor.Printf("  🔧 Fix results:\n%s\n", fixOutput)
 		successColor.Printf("  ✅ Security scan completed in %s\n", projectDir)
 		// Update vulnerabilities as fixed if fix was successful
 		for i := range result.Vulnerabilities {
 			result.Vulnerabilities[i].Fixed = true
 		}
 	} else {
-		warningColor.Printf("  ⚠️  Some fixes may not have been applied: %s\n", string(fixOutput))
+		warningColor.Printf("  ⚠️  Some fixes may not have been applied: %s\n", fixOutput)
 		successColor.Printf("  ✅ Security scan completed in %s (with warnings)\n", projectDir)
 	}
+}
 
-	// 結果を表示（簡潔に）
+// displayScanResults displays scan results summary
+func displayScanResults(result *ScanResult, projectDir string) {
 	infoColor.Printf("  📊 Security scan results for %s:\n", projectDir)
 	if len(result.Vulnerabilities) > 0 {
 		warningColor.Printf("  🚨 Found %d vulnerabilities\n", len(result.Vulnerabilities))
 	} else {
 		successColor.Printf("  🛡️  No vulnerabilities detected\n")
 	}
-
-	return nil
 }
 
 // runDemoScan runs a demo scan when Safe Chain is not available

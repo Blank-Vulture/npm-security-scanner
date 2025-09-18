@@ -59,7 +59,7 @@ func showProjectsAndConfirm(projects []string) bool {
 }
 
 // scanProjects performs security scan on all given projects
-func scanProjects(projects []string) error {
+func scanProjects(projects []string) {
 	initReport()
 	setSafeChainMode(isSafeChainAvailable())
 
@@ -71,7 +71,6 @@ func scanProjects(projects []string) error {
 
 	finalizeReport()
 	showScanResults()
-	return nil
 }
 
 // scanSingleProject scans a single project and adds result to report
