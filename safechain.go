@@ -198,81 +198,136 @@ func runDemoScan(projectDir string, result *ScanResult) error {
 func parseVulnerabilities(auditOutput string) []Vulnerability {
 	vulnerabilities := []Vulnerability{}
 
-	// npm auditの出力を解析（JSON形式とテキスト形式の両方に対応）
-	if strings.Contains(auditOutput, "vulnerabilities") {
-		lines := strings.Split(auditOutput, "\n")
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
+	// Parse direct vulnerability information
+	vulnerabilities = append(vulnerabilities, parseSeverityLines(auditOutput)...)
 
-			// 具体的な脆弱性情報を検索
-			if strings.Contains(line, "Severity: ") {
-				parts := strings.Split(line, "Severity: ")
-				if len(parts) > 1 {
-					severity := strings.ToLower(strings.TrimSpace(parts[1]))
-					vulnerabilities = append(vulnerabilities, Vulnerability{
-						Severity:    severity,
-						Package:     "detected-package",
-						Description: fmt.Sprintf("%s severity vulnerability found", severity),
-						Fixed:       false,
-					})
-				}
-			}
+	// Parse vulnerability count information
+	vulnerabilities = append(vulnerabilities, parseVulnerabilityCountLines(auditOutput)...)
 
-			// パッケージ名を検出
-			if strings.Contains(line, "node_modules/") && len(vulnerabilities) > 0 {
-				parts := strings.Split(line, "node_modules/")
-				if len(parts) > 1 {
-					packageName := strings.Split(parts[1], " ")[0]
-					vulnerabilities[len(vulnerabilities)-1].Package = packageName
-				}
+	// Remove duplicates
+	return removeDuplicateVulnerabilities(vulnerabilities)
+}
+
+// parseSeverityLines parses lines containing "Severity: " information
+func parseSeverityLines(auditOutput string) []Vulnerability {
+	vulnerabilities := []Vulnerability{}
+
+	if !strings.Contains(auditOutput, "vulnerabilities") {
+		return vulnerabilities
+	}
+
+	lines := strings.Split(auditOutput, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+
+		// Parse direct severity information
+		if strings.Contains(line, "Severity: ") {
+			vuln := parseSeverityLine(line)
+			if vuln != nil {
+				vulnerabilities = append(vulnerabilities, *vuln)
 			}
+		}
+
+		// Update package name if found
+		if strings.Contains(line, "node_modules/") && len(vulnerabilities) > 0 {
+			updatePackageName(line, &vulnerabilities[len(vulnerabilities)-1])
 		}
 	}
 
-	// 脆弱性数の情報からも抽出
-	if strings.Contains(auditOutput, VulnerabilityText) {
-		lines := strings.Split(auditOutput, "\n")
-		for _, line := range lines {
-			hasVulnText := strings.Contains(line, VulnerabilityText)
-			hasFoundText := strings.Contains(line, "found") ||
-				strings.Contains(line, SeverityModerate) ||
-				strings.Contains(line, SeverityHigh) ||
-				strings.Contains(line, SeverityCritical) ||
-				strings.Contains(line, SeverityLow)
+	return vulnerabilities
+}
 
-			if hasVulnText && hasFoundText {
-				// "1 moderate severity vulnerability" のような行を解析
-				words := strings.Fields(line)
-				for i, word := range words {
-					var isSeverityWord bool
-					switch word {
-					case "moderate", "high", "critical", "low":
-						isSeverityWord = true
-					default:
-						isSeverityWord = false
-					}
+// parseSeverityLine parses a single line containing severity information
+func parseSeverityLine(line string) *Vulnerability {
+	parts := strings.Split(line, "Severity: ")
+	if len(parts) <= 1 {
+		return nil
+	}
 
-					if isSeverityWord && i > 0 {
-						// 前の単語が数字かチェック
-						if i > 0 {
-							severity := strings.ToLower(word)
-							vulnerabilities = append(vulnerabilities, Vulnerability{
-								Severity:    severity,
-								Package:     "npm-audit-detected",
-								Description: fmt.Sprintf("%s severity vulnerability detected via npm audit", severity),
-								Fixed:       false,
-							})
-						}
-						break
-					}
-				}
-			}
+	severity := strings.ToLower(strings.TrimSpace(parts[1]))
+	return &Vulnerability{
+		Severity:    severity,
+		Package:     "detected-package",
+		Description: fmt.Sprintf("%s severity vulnerability found", severity),
+		Fixed:       false,
+	}
+}
+
+// updatePackageName updates the package name from node_modules path
+func updatePackageName(line string, vuln *Vulnerability) {
+	parts := strings.Split(line, "node_modules/")
+	if len(parts) > 1 {
+		packageName := strings.Split(parts[1], " ")[0]
+		vuln.Package = packageName
+	}
+}
+
+// parseVulnerabilityCountLines parses lines containing vulnerability count information
+func parseVulnerabilityCountLines(auditOutput string) []Vulnerability {
+	vulnerabilities := []Vulnerability{}
+
+	if !strings.Contains(auditOutput, VulnerabilityText) {
+		return vulnerabilities
+	}
+
+	lines := strings.Split(auditOutput, "\n")
+	for _, line := range lines {
+		if hasVulnerabilityInfo(line) {
+			vulns := parseVulnerabilityCountLine(line)
+			vulnerabilities = append(vulnerabilities, vulns...)
 		}
 	}
 
-	// 重複除去
+	return vulnerabilities
+}
+
+// hasVulnerabilityInfo checks if line contains vulnerability information
+func hasVulnerabilityInfo(line string) bool {
+	hasVulnText := strings.Contains(line, VulnerabilityText)
+	hasFoundText := strings.Contains(line, "found") ||
+		strings.Contains(line, SeverityModerate) ||
+		strings.Contains(line, SeverityHigh) ||
+		strings.Contains(line, SeverityCritical) ||
+		strings.Contains(line, SeverityLow)
+	return hasVulnText && hasFoundText
+}
+
+// parseVulnerabilityCountLine parses a line containing vulnerability count
+func parseVulnerabilityCountLine(line string) []Vulnerability {
+	vulnerabilities := []Vulnerability{}
+	words := strings.Fields(line)
+
+	for i, word := range words {
+		if isSeverityWord(word) && i > 0 {
+			severity := strings.ToLower(word)
+			vulnerabilities = append(vulnerabilities, Vulnerability{
+				Severity:    severity,
+				Package:     "npm-audit-detected",
+				Description: fmt.Sprintf("%s severity vulnerability detected via npm audit", severity),
+				Fixed:       false,
+			})
+			break
+		}
+	}
+
+	return vulnerabilities
+}
+
+// isSeverityWord checks if word is a severity keyword
+func isSeverityWord(word string) bool {
+	switch word {
+	case "moderate", "high", "critical", "low":
+		return true
+	default:
+		return false
+	}
+}
+
+// removeDuplicateVulnerabilities removes duplicate vulnerabilities
+func removeDuplicateVulnerabilities(vulnerabilities []Vulnerability) []Vulnerability {
 	uniqueVulns := []Vulnerability{}
 	seen := make(map[string]bool)
+
 	for _, v := range vulnerabilities {
 		key := v.Severity + v.Package + v.Description
 		if !seen[key] {

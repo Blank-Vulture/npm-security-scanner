@@ -15,9 +15,9 @@ type ScanResult struct {
 	StartTime       time.Time       `json:"start_time"`
 	EndTime         time.Time       `json:"end_time"`
 	Duration        time.Duration   `json:"duration"`
+	Vulnerabilities []Vulnerability `json:"vulnerabilities"`
 	ProjectPath     string          `json:"project_path"`
 	Status          string          `json:"status"`
-	Vulnerabilities []Vulnerability `json:"vulnerabilities"`
 	NodeModules     ActionResult    `json:"node_modules"`
 	NpmInstall      ActionResult    `json:"npm_install"`
 	SecurityScan    ActionResult    `json:"security_scan"`
@@ -25,9 +25,9 @@ type ScanResult struct {
 
 // ActionResult represents the result of a specific action
 type ActionResult struct {
-	Success bool   `json:"success"`
 	Error   string `json:"error"`
 	Output  string `json:"output"`
+	Success bool   `json:"success"`
 }
 
 // Vulnerability represents a security vulnerability found during scan
@@ -43,11 +43,11 @@ type ScanReport struct {
 	StartTime       time.Time     `json:"start_time"`
 	EndTime         time.Time     `json:"end_time"`
 	TotalDuration   time.Duration `json:"total_duration"`
+	Results         []ScanResult  `json:"results"`
+	ScanID          string        `json:"scan_id"`
 	ProjectsScanned int           `json:"projects_scanned"`
 	SuccessCount    int           `json:"success_count"`
 	ErrorCount      int           `json:"error_count"`
-	ScanID          string        `json:"scan_id"`
-	Results         []ScanResult  `json:"results"`
 	SafeChainMode   bool          `json:"safe_chain_mode"`
 }
 
@@ -103,11 +103,21 @@ func printTerminalReport() {
 		return
 	}
 
+	printReportHeader()
+	printReportSummary()
+	printProjectResults()
+	fmt.Println(strings.Repeat("=", ReportSeparator))
+}
+
+// printReportHeader prints the report header
+func printReportHeader() {
 	fmt.Println("\n" + strings.Repeat("=", ReportSeparator))
 	infoColor.Printf("📊 SCAN REPORT - %s\n", currentReport.ScanID)
 	fmt.Println(strings.Repeat("=", ReportSeparator))
+}
 
-	// Summary
+// printReportSummary prints the report summary statistics
+func printReportSummary() {
 	infoColor.Printf("⏱️  Total Duration: %v\n", currentReport.TotalDuration.Round(time.Second))
 	infoColor.Printf("📁 Projects Scanned: %d\n", currentReport.ProjectsScanned)
 	successColor.Printf("✅ Successful: %d\n", currentReport.SuccessCount)
@@ -116,66 +126,79 @@ func printTerminalReport() {
 	}
 	infoColor.Printf("🔒 Safe Chain Mode: %v\n", currentReport.SafeChainMode)
 	fmt.Println()
+}
 
-	// Results for each project
-	for i, result := range currentReport.Results {
-		fmt.Printf("📦 [%d/%d] %s\n", i+1, len(currentReport.Results), result.ProjectPath)
-		fmt.Printf("    Status: ")
-		if result.Status == StatusSuccess {
-			successColor.Printf("✅ Success")
-		} else {
-			errorColor.Printf("❌ %s", result.Status)
-		}
-		fmt.Printf(" (Duration: %v)\n", result.Duration.Round(time.Second))
-
-		// Node modules action
-		if result.NodeModules.Success {
-			fmt.Printf("    🗑️  Node Modules: ✅ Removed\n")
-		} else if result.NodeModules.Error != "" {
-			fmt.Printf("    🗑️  Node Modules: ❌ %s\n", result.NodeModules.Error)
-		}
-
-		// NPM install action
-		if result.NpmInstall.Success {
-			fmt.Printf("    📦 NPM Install: ✅ Success\n")
-		} else if result.NpmInstall.Error != "" {
-			fmt.Printf("    📦 NPM Install: ❌ %s\n", result.NpmInstall.Error)
-		}
-
-		// Security scan action
-		if result.SecurityScan.Success {
-			fmt.Printf("    🔍 Security Scan: ✅ Completed\n")
-		} else if result.SecurityScan.Error != "" {
-			fmt.Printf("    🔍 Security Scan: ❌ %s\n", result.SecurityScan.Error)
-		}
-
-		// Vulnerabilities
-		if len(result.Vulnerabilities) > 0 {
-			fmt.Printf("    🚨 Vulnerabilities: %d found\n", len(result.Vulnerabilities))
-			for _, vuln := range result.Vulnerabilities {
-				var severityColor *color.Color
-				switch vuln.Severity {
-				case SeverityHigh, SeverityCritical:
-					severityColor = errorColor
-				case SeverityLow:
-					severityColor = infoColor
-				default:
-					severityColor = warningColor
-				}
-				severityColor.Printf("      - %s: %s (%s)", vuln.Severity, vuln.Package, vuln.Description)
-				if vuln.Fixed {
-					successColor.Printf(" - FIXED")
-				}
-				fmt.Println()
-			}
-		} else if result.SecurityScan.Success {
-			fmt.Printf("    🛡️  No vulnerabilities detected\n")
-		}
-
+// printProjectResults prints detailed results for each project
+func printProjectResults() {
+	for i := range currentReport.Results {
+		result := &currentReport.Results[i]
+		printProjectHeader(i+1, result)
+		printProjectActions(result)
+		printProjectVulnerabilities(result)
 		fmt.Println()
 	}
+}
 
-	fmt.Println(strings.Repeat("=", ReportSeparator))
+// printProjectHeader prints project basic info
+func printProjectHeader(index int, result *ScanResult) {
+	fmt.Printf("📦 [%d/%d] %s\n", index, len(currentReport.Results), result.ProjectPath)
+	fmt.Printf("    Status: ")
+	if result.Status == StatusSuccess {
+		successColor.Printf("✅ Success")
+	} else {
+		errorColor.Printf("❌ %s", result.Status)
+	}
+	fmt.Printf(" (Duration: %v)\n", result.Duration.Round(time.Second))
+}
+
+// printProjectActions prints project action results
+func printProjectActions(result *ScanResult) {
+	printActionResult("🗑️  Node Modules", result.NodeModules, "Removed")
+	printActionResult("📦 NPM Install", result.NpmInstall, "Success")
+	printActionResult("🔍 Security Scan", result.SecurityScan, "Completed")
+}
+
+// printActionResult prints a single action result
+func printActionResult(name string, action ActionResult, successMsg string) {
+	if action.Success {
+		fmt.Printf("    %s: ✅ %s\n", name, successMsg)
+	} else if action.Error != "" {
+		fmt.Printf("    %s: ❌ %s\n", name, action.Error)
+	}
+}
+
+// printProjectVulnerabilities prints vulnerability information
+func printProjectVulnerabilities(result *ScanResult) {
+	if len(result.Vulnerabilities) > 0 {
+		fmt.Printf("    🚨 Vulnerabilities: %d found\n", len(result.Vulnerabilities))
+		for _, vuln := range result.Vulnerabilities {
+			printSingleVulnerability(vuln)
+		}
+	} else if result.SecurityScan.Success {
+		fmt.Printf("    🛡️  No vulnerabilities detected\n")
+	}
+}
+
+// printSingleVulnerability prints a single vulnerability
+func printSingleVulnerability(vuln Vulnerability) {
+	severityColor := getSeverityColor(vuln.Severity)
+	severityColor.Printf("      - %s: %s (%s)", vuln.Severity, vuln.Package, vuln.Description)
+	if vuln.Fixed {
+		successColor.Printf(" - FIXED")
+	}
+	fmt.Println()
+}
+
+// getSeverityColor returns appropriate color for vulnerability severity
+func getSeverityColor(severity string) *color.Color {
+	switch severity {
+	case SeverityHigh, SeverityCritical:
+		return errorColor
+	case SeverityLow:
+		return infoColor
+	default:
+		return warningColor
+	}
 }
 
 // generateHTMLReport generates an HTML report file
@@ -241,8 +264,8 @@ func getSafeChainTagClass() string {
 // getTotalVulnerabilities counts total vulnerabilities across all projects
 func getTotalVulnerabilities() int {
 	total := 0
-	for _, result := range currentReport.Results {
-		total += len(result.Vulnerabilities)
+	for i := range currentReport.Results {
+		total += len(currentReport.Results[i].Vulnerabilities)
 	}
 	return total
 }
@@ -260,72 +283,24 @@ func generateBulmaProjectsHTML() string {
 
 // generateBulmaProjectCard generates a Bulma card for a single project
 func generateBulmaProjectCard(index int, result *ScanResult) string {
-	// Determine status styling
-	statusClass := BulmaSuccess
-	statusIcon := "fas fa-check-circle"
-	if result.Status != StatusSuccess {
-		statusClass = BulmaDanger
-		statusIcon = "fas fa-times-circle"
-	}
-
-	// Generate actions HTML
-	actionsHTML := generateBulmaActionsHTML(result)
-
-	// Generate vulnerabilities HTML
-	vulnerabilitiesHTML := generateBulmaVulnerabilitiesHTML(result.Vulnerabilities, result.SecurityScan.Success)
-
+	statusClass, statusIcon := getProjectStatusStyle(result)
 	return fmt.Sprintf(`
         <div class="card project-card">
-            <header class="card-header">
-                <p class="card-header-title is-size-4">
-                    <i class="fas fa-folder-open"></i>&nbsp;
-                    %d. %s
-                </p>
-                <div class="card-header-icon">
-                    <span class="tag %s is-medium">
-                        <i class="%s"></i>&nbsp;
-                        %s
-                    </span>
-                </div>
-            </header>
+            %s
             <div class="card-content">
                 <div class="content">
-                    <div class="level">
-                        <div class="level-left">
-                            <div class="level-item">
-                                <div>
-                                    <p class="heading">Duration</p>
-                                    <p class="title is-6">%v</p>
-                                </div>
-                            </div>
-                            <div class="level-item">
-                                <div>
-                                    <p class="heading">Started</p>
-                                    <p class="title is-6">%s</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Steps -->
+                    %s
                     <div class="field is-grouped is-grouped-multiline">
                         %s
                     </div>
-
-                    <!-- Vulnerabilities Section -->
                     %s
                 </div>
             </div>
         </div>`,
-		index,
-		result.ProjectPath,
-		statusClass,
-		statusIcon,
-		result.Status,
-		result.Duration.Round(time.Second),
-		result.StartTime.Format("15:04:05"),
-		actionsHTML,
-		vulnerabilitiesHTML)
+		generateProjectCardHeader(index, result, statusClass, statusIcon),
+		generateProjectCardMeta(result),
+		generateBulmaActionsHTML(result),
+		generateBulmaVulnerabilitiesHTML(result.Vulnerabilities, result.SecurityScan.Success))
 }
 
 // generateBulmaActionsHTML generates Bulma tags for each action
@@ -482,84 +457,86 @@ func getFixedBadgeHTML(fixed bool) string {
 // generateBulmaHTMLReport generates a modern HTML report using Bulma CSS framework
 func generateBulmaHTMLReport() string {
 	return fmt.Sprintf(`<!DOCTYPE html>
-<html lang="en">
+%s
+<body>
+%s
+%s
+<section class="section">
+    <div class="container">
+        %s
+    </div>
+</section>
+%s
+</body>
+</html>`,
+		generateBulmaHTMLHead(),
+		generateBulmaHeroSection(),
+		generateBulmaStatsSection(),
+		generateBulmaProjectsHTML(),
+		generateBulmaFooter())
+}
+
+// generateBulmaHTMLHead generates HTML head section
+func generateBulmaHTMLHead() string {
+	return fmt.Sprintf(`<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NPM Security Scanner Report - %s</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .hero-gradient {
-            background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);
-        }
-        .card-equal-height {
-            height: 100%%;
-        }
-        .vulnerability-item {
-            border-left: 4px solid;
-            border-radius: 6px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            transition: all 0.2s ease;
-        }
-        .vulnerability-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .vuln-critical {
-            border-left-color: #ff3860;
-            background: linear-gradient(to right, #feecf0, #fef7f7);
-        }
-        .vuln-high {
-            border-left-color: #ff6348;
-            background: linear-gradient(to right, #fef0ef, #fef7f7);
-        }
-        .vuln-moderate {
-            border-left-color: #ffdd57;
-            background: linear-gradient(to right, #fffbeb, #fffef7);
-        }
-        .vuln-low {
-            border-left-color: #209cee;
-            background: linear-gradient(to right, #eff5ff, #f7faff);
-        }
-        .vuln-fixed {
-            border-left-color: #23d160;
-            background: linear-gradient(to right, #f0fff4, #f7fef9);
-        }
-        .stats-card {
-            transition: transform 0.2s ease;
-        }
-        .stats-card:hover {
-            transform: translateY(-4px);
-        }
-        .scan-meta {
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        .project-card {
-            margin-bottom: 1.5rem;
-        }
-    </style>
-</head>
-<body>
-    <!-- Hero Section with Gradient Background -->
-    <section class="hero is-large hero-gradient">
+    <style>%s</style>
+</head>`, currentReport.ScanID, generateBulmaCSS())
+}
+
+// generateBulmaCSS generates custom CSS styles
+func generateBulmaCSS() string {
+	return `
+        .hero-gradient { background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); }
+        .vulnerability-item { border-left: 4px solid; border-radius: 6px; padding: 1rem; margin-bottom: 0.75rem; transition: all 0.2s ease; }
+        .vulnerability-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .vuln-critical { border-left-color: #ff3860; background: linear-gradient(to right, #feecf0, #fef7f7); }
+        .vuln-high { border-left-color: #ff6348; background: linear-gradient(to right, #fef0ef, #fef7f7); }
+        .vuln-moderate { border-left-color: #ffdd57; background: linear-gradient(to right, #fffbeb, #fffef7); }
+        .vuln-low { border-left-color: #209cee; background: linear-gradient(to right, #eff5ff, #f7faff); }
+        .vuln-fixed { border-left-color: #23d160; background: linear-gradient(to right, #f0fff4, #f7fef9); }
+        .stats-card { transition: transform 0.2s ease; }
+        .stats-card:hover { transform: translateY(-4px); }
+        .scan-meta { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+        .project-card { margin-bottom: 1.5rem; }`
+}
+
+// generateBulmaHeroSection generates hero section HTML
+func generateBulmaHeroSection() string {
+	return fmt.Sprintf(`<section class="hero is-large hero-gradient">
         <div class="hero-body">
             <div class="container">
                 <h1 class="title is-1 has-text-white">
-                    <i class="fas fa-shield-virus"></i>
-                    NPM Security Scanner
+                    <i class="fas fa-shield-virus"></i> NPM Security Scanner
                 </h1>
                 <h2 class="subtitle is-3 has-text-white-ter">
                     Comprehensive malware protection for your Node.js projects
                 </h2>
                 <div class="scan-meta">
                     <div class="level">
-                        <div class="level-left">
+                        <div class="level-left">%s</div>
+                        <div class="level-right">
                             <div class="level-item">
+                                <span class="tag is-large %s">
+                                    <i class="fas fa-link"></i>&nbsp; Safe Chain: %v
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>`, generateMetaItems(), getSafeChainTagClass(), currentReport.SafeChainMode)
+}
+
+// generateMetaItems generates metadata items for hero section
+func generateMetaItems() string {
+	return fmt.Sprintf(`<div class="level-item">
                                 <div>
                                     <p class="heading has-text-white-ter">Report ID</p>
                                     <p class="title is-5 has-text-white">%s</p>
@@ -576,26 +553,24 @@ func generateBulmaHTMLReport() string {
                                     <p class="heading has-text-white-ter">Total Duration</p>
                                     <p class="title is-5 has-text-white">%v</p>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="level-right">
-                            <div class="level-item">
-                                <span class="tag is-large %s">
-                                    <i class="fas fa-link"></i>&nbsp;
-                                    Safe Chain: %v
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+                            </div>`,
+		currentReport.ScanID,
+		currentReport.EndTime.Format("2006-01-02 15:04:05"),
+		currentReport.TotalDuration.Round(time.Second))
+}
 
-    <!-- Statistics Cards -->
-    <section class="section">
+// generateBulmaStatsSection generates statistics cards section
+func generateBulmaStatsSection() string {
+	return fmt.Sprintf(`<section class="section">
         <div class="container">
-            <div class="columns">
+            <div class="columns">%s</div>
+        </div>
+    </section>`, generateStatsCards())
+}
+
+// generateStatsCards generates individual stat cards
+func generateStatsCards() string {
+	return fmt.Sprintf(`
                 <div class="column is-3">
                     <div class="card stats-card">
                         <div class="card-content has-text-centered">
@@ -639,40 +614,66 @@ func generateBulmaHTMLReport() string {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Project Results -->
-    <section class="section">
-        <div class="container">
-            %s
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="content has-text-centered">
-            <p>
-                <strong>NPM Security Scanner v1.3.0</strong><br>
-                Generated at %s<br>
-                <i class="fas fa-shield-alt"></i> Protecting your dependencies from malware
-            </p>
-        </div>
-    </footer>
-</body>
-</html>`,
-		currentReport.ScanID,
-		currentReport.ScanID,
-		currentReport.EndTime.Format("2006-01-02 15:04:05"),
-		currentReport.TotalDuration.Round(time.Second),
-		getSafeChainTagClass(),
-		currentReport.SafeChainMode,
+                </div>`,
 		currentReport.ProjectsScanned,
 		currentReport.SuccessCount,
 		currentReport.ErrorCount,
-		getTotalVulnerabilities(),
-		generateBulmaProjectsHTML(),
-		time.Now().Format("2006-01-02 15:04:05"))
+		getTotalVulnerabilities())
+}
+
+// generateBulmaFooter generates footer section
+func generateBulmaFooter() string {
+	return fmt.Sprintf(`<footer class="footer">
+    <div class="content has-text-centered">
+        <p>
+            <strong>NPM Security Scanner v1.3.0</strong><br>
+            Generated at %s<br>
+            <i class="fas fa-shield-alt"></i> Protecting your dependencies from malware
+        </p>
+    </div>
+</footer>`, time.Now().Format("2006-01-02 15:04:05"))
+}
+
+// getProjectStatusStyle returns status class and icon for project
+func getProjectStatusStyle(result *ScanResult) (string, string) {
+	if result.Status == StatusSuccess {
+		return BulmaSuccess, "fas fa-check-circle"
+	}
+	return BulmaDanger, "fas fa-times-circle"
+}
+
+// generateProjectCardHeader generates card header for project
+func generateProjectCardHeader(index int, result *ScanResult, statusClass, statusIcon string) string {
+	return fmt.Sprintf(`<header class="card-header">
+                <p class="card-header-title is-size-4">
+                    <i class="fas fa-folder-open"></i>&nbsp;
+                    %d. %s
+                </p>
+                <div class="card-header-icon">
+                    <span class="tag %s is-medium">
+                        <i class="%s"></i>&nbsp;
+                        %s
+                    </span>
+                </div>
+            </header>`, index, result.ProjectPath, statusClass, statusIcon, result.Status)
+}
+
+// generateProjectCardMeta generates project metadata section
+func generateProjectCardMeta(result *ScanResult) string {
+	return fmt.Sprintf(`<div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Duration</p>
+                                    <p class="title is-6">%v</p>
+                                </div>
+                            </div>
+                            <div class="level-item">
+                                <div>
+                                    <p class="heading">Started</p>
+                                    <p class="title is-6">%s</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`, result.Duration.Round(time.Second), result.StartTime.Format("15:04:05"))
 }

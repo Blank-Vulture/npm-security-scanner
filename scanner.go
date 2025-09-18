@@ -60,75 +60,91 @@ func showProjectsAndConfirm(projects []string) bool {
 
 // scanProjects performs security scan on all given projects
 func scanProjects(projects []string) error {
-	// Initialize report
 	initReport()
 	setSafeChainMode(isSafeChainAvailable())
 
 	infoColor.Printf("🚀 Starting security scan for %d project(s)...\n\n", len(projects))
 
 	for i, project := range projects {
-		infoColor.Printf("📦 [%d/%d] Processing: %s\n", i+1, len(projects), project)
-
-		// Create result for this project
-		result := ScanResult{
-			ProjectPath: project,
-			StartTime:   time.Now(),
-			Status:      StatusInProgress,
-		}
-
-		// Step 1: node_modules削除
-		if err := removeNodeModules(project); err != nil {
-			errorColor.Printf("❌ Failed to remove node_modules in %s: %v\n", project, err)
-			result.NodeModules.Success = false
-			result.NodeModules.Error = err.Error()
-			result.Status = StatusFailed
-		} else {
-			result.NodeModules.Success = true
-		}
-
-		// Step 2: npm install実行（node_modules削除が成功した場合のみ）
-		if result.NodeModules.Success {
-			if err := runNpmInstall(project); err != nil {
-				errorColor.Printf("❌ Failed to run npm install in %s: %v\n", project, err)
-				result.NpmInstall.Success = false
-				result.NpmInstall.Error = err.Error()
-				result.Status = StatusFailed
-			} else {
-				result.NpmInstall.Success = true
-			}
-		}
-
-		// Step 3: セキュリティスキャン実行（npm installが成功した場合のみ）
-		if result.NpmInstall.Success {
-			if err := runSecurityScan(project, &result); err != nil {
-				errorColor.Printf("❌ Failed to run security scan in %s: %v\n", project, err)
-				result.SecurityScan.Success = false
-				result.SecurityScan.Error = err.Error()
-				result.Status = StatusFailed
-			} else {
-				result.Status = StatusSuccess
-			}
-		}
-
-		// Finalize result
-		result.EndTime = time.Now()
-		result.Duration = result.EndTime.Sub(result.StartTime)
-
-		// Add to report
-		addProjectResult(&result)
-
-		if result.Status == StatusSuccess {
-			successColor.Printf("✅ [%d/%d] Completed: %s\n\n", i+1, len(projects), project)
-		} else {
-			errorColor.Printf("❌ [%d/%d] Failed: %s\n\n", i+1, len(projects), project)
-		}
+		scanSingleProject(i+1, len(projects), project)
 	}
 
-	// Finalize and show report
 	finalizeReport()
 	showScanResults()
-
 	return nil
+}
+
+// scanSingleProject scans a single project and adds result to report
+func scanSingleProject(current, total int, project string) {
+	infoColor.Printf("📦 [%d/%d] Processing: %s\n", current, total, project)
+
+	result := ScanResult{
+		ProjectPath: project,
+		StartTime:   time.Now(),
+		Status:      StatusInProgress,
+	}
+
+	// Step 1: Remove node_modules
+	result.NodeModules.Success = processNodeModulesStep(project, &result)
+
+	// Step 2: Run npm install (if step 1 succeeded)
+	if result.NodeModules.Success {
+		result.NpmInstall.Success = processNpmInstallStep(project, &result)
+	}
+
+	// Step 3: Run security scan (if step 2 succeeded)
+	if result.NpmInstall.Success {
+		processSecurityScanStep(project, &result)
+	}
+
+	// Finalize and add result
+	result.EndTime = time.Now()
+	result.Duration = result.EndTime.Sub(result.StartTime)
+	addProjectResult(&result)
+
+	printProjectResult(current, total, project, &result)
+}
+
+// processNodeModulesStep handles node_modules removal
+func processNodeModulesStep(project string, result *ScanResult) bool {
+	if err := removeNodeModules(project); err != nil {
+		errorColor.Printf("❌ Failed to remove node_modules in %s: %v\n", project, err)
+		result.NodeModules.Error = err.Error()
+		result.Status = StatusFailed
+		return false
+	}
+	return true
+}
+
+// processNpmInstallStep handles npm install
+func processNpmInstallStep(project string, result *ScanResult) bool {
+	if err := runNpmInstall(project); err != nil {
+		errorColor.Printf("❌ Failed to run npm install in %s: %v\n", project, err)
+		result.NpmInstall.Error = err.Error()
+		result.Status = StatusFailed
+		return false
+	}
+	return true
+}
+
+// processSecurityScanStep handles security scanning
+func processSecurityScanStep(project string, result *ScanResult) {
+	if err := runSecurityScan(project, result); err != nil {
+		errorColor.Printf("❌ Failed to run security scan in %s: %v\n", project, err)
+		result.SecurityScan.Error = err.Error()
+		result.Status = StatusFailed
+	} else {
+		result.Status = StatusSuccess
+	}
+}
+
+// printProjectResult prints the final result for a project
+func printProjectResult(current, total int, project string, result *ScanResult) {
+	if result.Status == StatusSuccess {
+		successColor.Printf("✅ [%d/%d] Completed: %s\n\n", current, total, project)
+	} else {
+		errorColor.Printf("❌ [%d/%d] Failed: %s\n\n", current, total, project)
+	}
 }
 
 // removeNodeModules removes the node_modules directory in the given project directory
