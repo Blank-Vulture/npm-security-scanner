@@ -1,3 +1,4 @@
+// Package main provides NPM security scanner for detecting malware in Node.js projects
 package main
 
 // Status constants
