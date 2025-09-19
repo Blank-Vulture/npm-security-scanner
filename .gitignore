@@ -42,8 +42,10 @@ Thumbs.db
 *.log
 
 # Temporary files
+reports/
 *.tmp
 *.temp
+
 
 # Environment variables
 .env
